@@ -47,60 +47,22 @@ const observer = new IntersectionObserver(
 
 reveals.forEach((el) => observer.observe(el));
 
-//
-window.addEventListener("DOMContentLoaded", () => {
-  const containers = document.querySelectorAll(".spline");
+// ===== ACTIVE NAV LINK SYSTEM =====
+function setActiveNav() {
+  const currentPage = window.location.pathname.split("/").pop();
 
-  containers.forEach((container) => {
-    const viewer = container.querySelector("spline-viewer");
+  const allLinks = document.querySelectorAll(
+    ".nav-link ul li a, .nav-link-mobile ul li a"
+  );
 
-    const observer = new MutationObserver(() => {
-      const canvas = viewer.shadowRoot?.querySelector("canvas");
+  allLinks.forEach((link) => {
+    const linkPage = link.getAttribute("href");
 
-      if (canvas) {
-        container.classList.add("show");
-        observer.disconnect();
-      }
-    });
-
-    observer.observe(viewer, { childList: true, subtree: true });
-
-    // Safety fallback for each spline
-    setTimeout(() => {
-      container.classList.add("show");
-    }, 1000);
-  });
-});
-
-window.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".spline").forEach((container) => {
-    const viewer = container.querySelector("spline-viewer");
-
-    /* ---------- 2. Pause when not visible (HUGE GPU SAVE) ---------- */
-    const visibility = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          viewer.play();
-        } else {
-          viewer.pause();
-        }
-      });
-    });
-
-    visibility.observe(viewer);
-
-    /* ---------- 3. FPS LIMIT (if supported) ---------- */
-    viewer.setAttribute("render-fps", "30");
-
-    /* ---------- 4. Low device fallback ---------- */
-    const isLowDevice =
-      navigator.hardwareConcurrency <= 4 || !window.WebGLRenderingContext;
-
-    if (isLowDevice) {
-      const img = document.createElement("img");
-      img.src = "spline-fallback.jpg"; // put a screenshot here
-      img.style.width = "100%";
-      viewer.replaceWith(img);
+    if (linkPage === currentPage) {
+      link.classList.add("active");
     }
   });
-});
+}
+
+// Run after page loads
+window.addEventListener("DOMContentLoaded", setActiveNav);
